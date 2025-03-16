@@ -19,7 +19,7 @@ export async function PUT(request: NextRequest, context: { params: { id: string 
     }
 
     // Récupérer les données du corps de la requête
-    const { term, definition, part_of_speech, example } = await request.json()
+    const { term, definition} = await request.json()
 
     // Validation des données
     if (!term || !definition) {
