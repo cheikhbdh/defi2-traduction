@@ -30,7 +30,9 @@ export function MainNav() {
     async function loadUser() {
       try {
         const userData = await getCurrentUser()
-        localStorage.setItem('userid', userData?.id!)
+        if (userData?.id) {
+          localStorage.setItem('userid', userData.id.toString())
+        }
         setUser(userData)
       } catch (error) {
         console.error("Erreur lors du chargement de l'utilisateur :", error)
@@ -68,10 +70,10 @@ export function MainNav() {
               <Link
                 href="/moderateur"
                 className={`hover:text-primary-foreground/80 ${
-                  pathname?.startsWith("/maderateur") ? "font-medium" : ""
+                  pathname?.startsWith("/moderateur") ? "font-medium" : ""
                 }`}
               >
-                moderateur
+                Modérateur
               </Link>
               <Link
                 href="/contribute"
