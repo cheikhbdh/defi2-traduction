@@ -2,16 +2,17 @@ import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, context: { params: { id: string } }) {
   try {
-    const id = params.id
+    const id = context.params.id
+    console.log("ID reçu:", id)
+
     const cookieStore = cookies()
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
     // Vérifier si l'utilisateur est authentifié
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+    const session = sessionData?.session
 
     if (!session) {
       return NextResponse.json({ error: "Vous devez être connecté pour approuver un mot" }, { status: 401 })
@@ -24,16 +25,17 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       .eq("id", session.user.id)
       .single()
 
-    if (profileError) {
+    if (profileError || !profile) {
+      console.error("Erreur profil:", profileError)
       return NextResponse.json({ error: "Erreur lors de la vérification du profil" }, { status: 500 })
     }
 
-    if (!profile || !["moderateur", "admin"].includes(profile.role)) {
+    if (!["moderateur", "admin"].includes(profile.role)) {
       return NextResponse.json({ error: "Vous n'avez pas les droits pour approuver des mots" }, { status: 403 })
     }
 
     // Mettre à jour le statut du mot
-    const { data, error } = await supabase
+    const { data: updatedWord, error: updateError } = await supabase
       .from("words")
       .update({
         status: "approved",
@@ -41,39 +43,50 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       })
       .eq("id", id)
       .select()
+      .single()
 
-    if (error) {
-      console.error("Erreur lors de l'approbation:", error)
+    if (updateError || !updatedWord) {
+      console.error("Erreur update:", updateError)
       return NextResponse.json({ error: "Erreur lors de l'approbation du mot" }, { status: 500 })
     }
 
-    // Ajouter des points au contributeur
-    const { data: word } = await supabase.from("words").select("created_by").eq("id", id).single()
+    console.log("Mot approuvé:", updatedWord)
 
-    if (word && word.created_by) {
-      // Vérifier si l'utilisateur a déjà une entrée dans la table rewards
+    // Ajouter des points au contributeur
+    const { data: word, error: wordError } = await supabase
+      .from("words")
+      .select("created_by")
+      .eq("id", id)
+      .single()
+
+    if (wordError || !word) {
+      console.error("Erreur récupération mot:", wordError)
+      return NextResponse.json({ error: "Erreur lors de la récupération du mot" }, { status: 500 })
+    }
+
+    console.log("Mot créé par:", word.created_by)
+
+    if (word.created_by) {
       const { data: rewardData, error: rewardError } = await supabase
         .from("rewards")
-        .select("*")
+        .select("points")
         .eq("user_id", word.created_by)
         .single()
 
-      if (rewardError && rewardError.code !== "PGRST116") {
-        // PGRST116 = not found
-        console.error("Erreur lors de la vérification des récompenses:", rewardError)
+      if (rewardError && !rewardData) {
+        console.error("Erreur récupération récompenses:", rewardError)
       }
 
       if (rewardData) {
-        // Mettre à jour les points existants (ajouter 15 points pour l'approbation)
+        console.log("Points actuels:", rewardData.points)
         await supabase
           .from("rewards")
           .update({
-            points: rewardData.points + 15,
+            points: (rewardData.points || 0) + 15,
             updated_at: new Date().toISOString(),
           })
           .eq("user_id", word.created_by)
       } else {
-        // Créer une nouvelle entrée de récompense
         await supabase.from("rewards").insert([
           {
             user_id: word.created_by,
@@ -85,10 +98,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       }
     }
 
-    return NextResponse.json({ success: true, data }, { status: 200 })
+    return NextResponse.json({ success: true, data: updatedWord }, { status: 200 })
   } catch (error) {
-    console.error("Erreur:", error)
+    console.error("Erreur inconnue:", error)
     return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 })
   }
 }
-
