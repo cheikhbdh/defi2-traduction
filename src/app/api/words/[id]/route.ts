@@ -1,198 +1,124 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { cookies } from "next/headers"
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
+import { cookies } from "next/headers"
+import { type NextRequest, NextResponse } from "next/server"
 
-// Fonction pour obtenir le client Supabase
-function getSupabaseClient() {
+// Mettre à jour un mot existant
+export async function PUT(request: NextRequest, context: { params: { id: string } }) {
+  try {
+    const id = context.params.id
     const cookieStore = cookies()
-    return createRouteHandlerClient({ cookies: () => cookieStore })
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
-}
+    // Vérifier si l'utilisateur est authentifié
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
 
-// Fonction pour obtenir l'utilisateur actuel
-async function getCurrentUser() {
-  const supabase = getSupabaseClient()
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
-  if (!session) {
-    return null
-  }
-
-  const { data: profile } = await supabase.from("profiles").select("*").eq("id", session.user.id).single()
-
-  return {
-    id: session.user.id,
-    email: session.user.email,
-    role: profile?.role || "moderateur",
-    name: profile?.name || session.user.email,
-  }
-}
-
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    const supabase = getSupabaseClient()
-    const id = Number.parseInt(params.id)
-
-    // Récupérer le mot
-    const { data: word, error: wordError } = await supabase.from("words").select("*").eq("id", id).single()
-
-    if (wordError || !word) {
-      return NextResponse.json({ error: "Mot non trouvé" }, { status: 404 })
-    }
-
-    // Récupérer les variantes du mot
-    const { data: variants, error: variantsError } = await supabase.from("word_variants").select("*").eq("word_id", id)
-
-    if (variantsError) {
-      console.error("Erreur lors de la récupération des variantes:", variantsError)
-    }
-
-    // Récupérer les contributions liées au mot
-    const { data: contributions, error: contributionsError } = await supabase
-      .from("contributions")
-      .select(`
-        *,
-        profiles:profiles(name)
-      `)
-      .eq("word_id", id)
-
-    if (contributionsError) {
-      console.error("Erreur lors de la récupération des contributions:", contributionsError)
-    }
-
-    // Formater les contributions pour correspondre à l'ancien format
-    const formattedContributions =
-      contributions?.map((contribution) => ({
-        ...contribution,
-        contributor_name: contribution.profiles?.name,
-      })) || []
-
-    return NextResponse.json(
-      {
-        word,
-        variants: variants || [],
-        contributions: formattedContributions,
-      },
-      { status: 200 },
-    )
-  } catch (error) {
-    console.error("Erreur lors de la récupération du mot:", error)
-    return NextResponse.json({ error: "Erreur lors de la récupération du mot" }, { status: 500 })
-  }
-}
-
-// PUT /api/words/[id] - Modifier un mot existant
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    const supabase = getSupabaseClient()
-    const user = await getCurrentUser()
-
-    if (!user) {
+    if (!session) {
       return NextResponse.json({ error: "Vous devez être connecté pour modifier un mot" }, { status: 401 })
     }
 
-    const id = Number.parseInt(params.id)
-    const body = await request.json()
-    const { term, definition } = body
+    // Récupérer les données du corps de la requête
+    const { term, definition, part_of_speech, example } = await request.json()
 
-    // Vérifier si le mot existe
-    const { data: existingWord, error: wordError } = await supabase.from("words").select("*").eq("id", id).single()
+    // Validation des données
+    if (!term || !definition) {
+      return NextResponse.json({ error: "Le terme et la définition sont requis" }, { status: 400 })
+    }
 
-    if (wordError || !existingWord) {
+    // Vérifier que l'utilisateur est le créateur du mot
+    const { data: word, error: wordError } = await supabase.from("words").select("created_by").eq("id", id).single()
+
+    if (wordError) {
       return NextResponse.json({ error: "Mot non trouvé" }, { status: 404 })
     }
 
-    // Vérifier si l'utilisateur est l'auteur du mot ou un administrateur
-    if (existingWord.created_by !== user.id && user.role !== "admin") {
+    if (word.created_by !== session.user.id) {
       return NextResponse.json({ error: "Vous n'êtes pas autorisé à modifier ce mot" }, { status: 403 })
     }
 
     // Mettre à jour le mot
-    const { data: updatedWord, error: updateError } = await supabase
+    const { data, error } = await supabase
       .from("words")
       .update({
-        term: term || existingWord.term,
-        definition: definition || existingWord.definition,
+        term,
+        definition,
         updated_at: new Date().toISOString(),
       })
       .eq("id", id)
       .select()
-      .single()
 
-    if (updateError) {
-      throw updateError
+    if (error) {
+      console.error("Erreur lors de la mise à jour:", error)
+      return NextResponse.json({ error: "Erreur lors de la mise à jour du mot" }, { status: 500 })
     }
 
-    // Ajouter une contribution pour tracer la modification
-    const { error: contributionError } = await supabase.from("contributions").insert({
-      word_id: id,
-      user_id: user.id,
-      comment: "Modification du mot",
-      created_at: new Date().toISOString(),
-    })
-
-    if (contributionError) {
-      console.error("Erreur lors de l'ajout de la contribution:", contributionError)
-    }
-
-    return NextResponse.json({ word: updatedWord }, { status: 200 })
+    return NextResponse.json({ success: true, data }, { status: 200 })
   } catch (error) {
-    console.error("Erreur lors de la modification du mot:", error)
-    return NextResponse.json({ error: "Erreur lors de la modification du mot" }, { status: 500 })
+    console.error("Erreur:", error)
+    return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 })
   }
 }
 
-// DELETE /api/words/[id] - Supprimer un mot
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+// Supprimer un mot
+export async function DELETE(request: NextRequest, context: { params: { id: string } }) {
   try {
-    const supabase = getSupabaseClient()
-    const user = await getCurrentUser()
+    const id = context.params.id
+    const cookieStore = cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
-    if (!user) {
+    // Vérifier si l'utilisateur est authentifié
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+
+    if (!session) {
       return NextResponse.json({ error: "Vous devez être connecté pour supprimer un mot" }, { status: 401 })
     }
 
-    const id = Number.parseInt(params.id)
+    // Vérifier que l'utilisateur est le créateur du mot
+    const { data: word, error: wordError } = await supabase.from("words").select("created_by").eq("id", id).single()
 
-    // Vérifier si le mot existe
-    const { data: existingWord, error: wordError } = await supabase.from("words").select("*").eq("id", id).single()
-
-    if (wordError || !existingWord) {
+    if (wordError) {
       return NextResponse.json({ error: "Mot non trouvé" }, { status: 404 })
     }
 
-    // Vérifier si l'utilisateur est l'auteur du mot ou un administrateur
-    if (existingWord.created_by !== user.id && user.role !== "admin") {
+    if (word.created_by !== session.user.id) {
       return NextResponse.json({ error: "Vous n'êtes pas autorisé à supprimer ce mot" }, { status: 403 })
     }
 
-    // Supprimer d'abord les variantes du mot
-    const { error: variantsError } = await supabase.from("word_variants").delete().eq("word_id", id)
-
-    if (variantsError) {
-      console.error("Erreur lors de la suppression des variantes:", variantsError)
-    }
-
-    // Supprimer les contributions liées au mot
-    const { error: contributionsError } = await supabase.from("contributions").delete().eq("word_id", id)
-
-    if (contributionsError) {
-      console.error("Erreur lors de la suppression des contributions:", contributionsError)
-    }
-
     // Supprimer le mot
-    const { error: deleteError } = await supabase.from("words").delete().eq("id", id)
+    const { error } = await supabase.from("words").delete().eq("id", id)
 
-    if (deleteError) {
-      throw deleteError
+    if (error) {
+      console.error("Erreur lors de la suppression:", error)
+      return NextResponse.json({ error: "Erreur lors de la suppression du mot" }, { status: 500 })
     }
 
-    return NextResponse.json({ message: "Mot supprimé avec succès" }, { status: 200 })
+    // Réduire les points de l'utilisateur (optionnel)
+    const { data: rewards, error: rewardsError } = await supabase
+      .from("rewards")
+      .select("points")
+      .eq("user_id", session.user.id)
+      .single()
+
+    if (!rewardsError && rewards) {
+      // Réduire les points (minimum 0)
+      const newPoints = Math.max(0, rewards.points - 5)
+
+      await supabase
+        .from("rewards")
+        .update({
+          points: newPoints,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", session.user.id)
+    }
+
+    return NextResponse.json({ success: true }, { status: 200 })
   } catch (error) {
-    console.error("Erreur lors de la suppression du mot:", error)
-    return NextResponse.json({ error: "Erreur lors de la suppression du mot" }, { status: 500 })
+    console.error("Erreur:", error)
+    return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 })
   }
 }
 

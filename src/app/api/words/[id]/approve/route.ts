@@ -2,9 +2,10 @@ import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+// Correction de la signature de la fonction pour les routes dynamiques dans Next.js
+export async function PUT(request: NextRequest, context: { params: { id: string } }) {
   try {
-    const id = params.id  // ✅ Correction ici
+    const id = context.params.id
     console.log("ID reçu:", id)
 
     const cookieStore = cookies()
@@ -53,11 +54,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     console.log("Mot approuvé:", updatedWord)
 
     // Ajouter des points au contributeur
-    const { data: word, error: wordError } = await supabase
-      .from("words")
-      .select("created_by")
-      .eq("id", id)
-      .single()
+    const { data: word, error: wordError } = await supabase.from("words").select("created_by").eq("id", id).single()
 
     if (wordError || !word) {
       console.error("Erreur récupération mot:", wordError)
@@ -104,3 +101,4 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 })
   }
 }
+

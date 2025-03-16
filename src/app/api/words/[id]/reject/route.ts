@@ -2,16 +2,17 @@ import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, context: { params: { id: string } }) {
   try {
-    const id = params.id
+    const id = context.params.id
+    console.log("ID reçu pour rejet:", id)
+
     const cookieStore = cookies()
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
     // Vérifier si l'utilisateur est authentifié
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
+    const { data: sessionData } = await supabase.auth.getSession()
+    const session = sessionData?.session
 
     if (!session) {
       return NextResponse.json({ error: "Vous devez être connecté pour rejeter un mot" }, { status: 401 })
@@ -24,11 +25,12 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       .eq("id", session.user.id)
       .single()
 
-    if (profileError) {
+    if (profileError || !profile) {
+      console.error("Erreur profil:", profileError)
       return NextResponse.json({ error: "Erreur lors de la vérification du profil" }, { status: 500 })
     }
 
-    if (!profile || !["moderateur", "admin"].includes(profile.role)) {
+    if (!["moderateur", "admin"].includes(profile.role)) {
       return NextResponse.json({ error: "Vous n'avez pas les droits pour rejeter des mots" }, { status: 403 })
     }
 
