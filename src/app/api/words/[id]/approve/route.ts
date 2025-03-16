@@ -2,9 +2,9 @@ import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
 
-export async function PUT(request: NextRequest, context: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const id = context.params.id
+    const id = params.id  // ✅ Correction ici
     console.log("ID reçu:", id)
 
     const cookieStore = cookies()
