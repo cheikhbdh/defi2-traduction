@@ -30,9 +30,10 @@ export function MainNav() {
     async function loadUser() {
       try {
         const userData = await getCurrentUser()
+        localStorage.setItem('userid', userData?.id!)
         setUser(userData)
       } catch (error) {
-        console.error("Error loading user:", error)
+        console.error("Erreur lors du chargement de l'utilisateur :", error)
       } finally {
         setIsLoading(false)
       }
@@ -53,7 +54,7 @@ export function MainNav() {
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-8">
             <Link href="/" className="text-xl font-bold">
-              Hassaniya Dictionary
+              Dictionnaire Hassaniya
             </Link>
             <nav className="hidden md:flex space-x-6">
               <Link
@@ -62,32 +63,24 @@ export function MainNav() {
                   pathname?.startsWith("/dictionary") ? "font-medium" : ""
                 }`}
               >
-                Dictionary
+                Dictionnaire
               </Link>
               <Link
-                href="/contributy"
+                href="/contribute"
                 className={`hover:text-primary-foreground/80 ${
                   pathname?.startsWith("/contribute") ? "font-medium" : ""
                 }`}
               >
-                Contribute
+                Contribuer
               </Link>
               <Link
-            href="/text-analysic"
-            className={`hover:text-primary-foreground/80 ${
-              pathname?.startsWith("/text-analysic") ? "font-medium" : ""
-            }`}
-          >
-            Analyse de Texte
-          </Link>
-          <Link
-            href="/word-variants"
-            className={`hover:text-primary-foreground/80 ${
-              pathname?.startsWith("/word-variants") ? "font-medium" : ""
-            }`}
-          >
-            Variantes de Mots
-          </Link>
+                href="/text-analysic"
+                className={`hover:text-primary-foreground/80 ${
+                  pathname?.startsWith("/text-analysic") ? "font-medium" : ""
+                }`}
+              >
+                Analyse de Texte
+              </Link>
               {user?.role === "admin" && (
                 <Link
                   href="/admin"
@@ -112,22 +105,22 @@ export function MainNav() {
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem className="cursor-pointer" onClick={() => router.push("/profile")}>
                     <User className="mr-2 h-4 w-4" />
-                    Profile
+                    Profil
                   </DropdownMenuItem>
                   <DropdownMenuItem className="cursor-pointer" onClick={() => router.push("/dictionary")}>
                     <Book className="mr-2 h-4 w-4" />
-                    Dictionary
+                    Dictionnaire
                   </DropdownMenuItem>
                   {user.role === "admin" && (
                     <DropdownMenuItem className="cursor-pointer" onClick={() => router.push("/admin")}>
                       <Settings className="mr-2 h-4 w-4" />
-                      Admin Dashboard
+                      Tableau de bord Admin
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem className="cursor-pointer" onClick={handleSignOut}>
                     <LogOut className="mr-2 h-4 w-4" />
-                    Logout
+                    Déconnexion
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -139,7 +132,7 @@ export function MainNav() {
                   className="hover:bg-primary-foreground/10 text-primary-foreground font-medium transition-colors"
                   onClick={() => router.push("/auth/login")}
                 >
-                  Login
+                  Connexion
                 </Button>
                 <Button
                   variant="secondary"
@@ -147,7 +140,7 @@ export function MainNav() {
                   className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-medium"
                   onClick={() => router.push("/auth/register")}
                 >
-                  Register
+                  Inscription
                 </Button>
               </div>
             )}

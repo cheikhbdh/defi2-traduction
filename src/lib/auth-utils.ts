@@ -7,25 +7,30 @@ export async function getCurrentUser() {
   const supabase = createClientComponentClient<Database>()
 
   try {
-    // Get the current session
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
+    // Récupérer la session
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
 
-    console.log("Session in getCurrentUser:", session)
-
-    if (!session) {
-      console.log("⚠️ No session found in getCurrentUser")
+    if (sessionError) {
+      console.error("Erreur lors de la récupération de la session:", sessionError)
       return null
     }
 
-    // Fetch the user profile with role information
-    const { data: profile, error } = await supabase.from("profiles").select("role").eq("id", session.user.id).single()
+    console.log("Session in getCurrentUser:", session)
 
-    console.log("Profile:", profile, "Error:", error)
+    if (!session || !session.user) {
+      console.log("⚠️ Aucune session active trouvée")
+      return null
+    }
 
-    if (error || !profile) {
-      console.log("⚠️ Error or profile not found:", error)
+    // Vérifier si l'utilisateur existe dans la table `profiles`
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", session.user.id)
+      .single()
+
+    if (profileError) {
+      console.error("⚠️ Profil utilisateur introuvable:", profileError)
       return null
     }
 
@@ -35,12 +40,10 @@ export async function getCurrentUser() {
       role: profile.role,
     }
   } catch (error) {
-    console.error("Error in getCurrentUser:", error)
+    console.error("Erreur dans getCurrentUser:", error)
     return null
   }
 }
-
-
 
 export async function hasRole(role: string) {
   const user = await getCurrentUser()

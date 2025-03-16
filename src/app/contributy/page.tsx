@@ -23,6 +23,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { ProtectedRoute } from "@/components/protected-route"
 
 type WordFormType = {
   term: string
@@ -260,6 +261,7 @@ export default function ContributePage() {
   }
 
   return (
+        <ProtectedRoute requiredRole="contributeur">
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">Contribuer au Dictionnaire</h1>
 
@@ -318,24 +320,7 @@ export default function ContributePage() {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="part-of-speech">Catégorie grammaticale</Label>
-                  <Select onValueChange={(value) => handleChange("partOfSpeech", value)} value={wordForm.partOfSpeech}>
-                    <SelectTrigger id="part-of-speech">
-                      <SelectValue placeholder="Sélectionner une catégorie grammaticale" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="noun">Nom</SelectItem>
-                      <SelectItem value="verb">Verbe</SelectItem>
-                      <SelectItem value="adjective">Adjectif</SelectItem>
-                      <SelectItem value="adverb">Adverbe</SelectItem>
-                      <SelectItem value="pronoun">Pronom</SelectItem>
-                      <SelectItem value="preposition">Préposition</SelectItem>
-                      <SelectItem value="conjunction">Conjonction</SelectItem>
-                      <SelectItem value="interjection">Interjection</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+               
 
                 <div className="space-y-2">
                   <Label htmlFor="definition">Définition</Label>
@@ -467,6 +452,7 @@ export default function ContributePage() {
         </TabsContent>
       </Tabs>
     </div>
+    </ProtectedRoute>
   )
 }
 

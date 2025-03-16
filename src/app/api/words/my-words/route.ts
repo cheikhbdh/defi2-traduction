@@ -1,22 +1,25 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { cookies } from "next/headers"
-import { getCurrentUser } from "@/lib/auth-utils"
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
 
 export async function GET(request: NextRequest) {
   try {
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-    const supabase = createClient(supabaseUrl, supabaseKey)
 
-   const session = await getCurrentUser()
+    const cookieStore = cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+
+    // Vérifier si l'utilisateur est authentifié
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
 
     const { data: words, error } = await supabase
       .from("words")
       .select("*")
-      .eq("created_by", session?.id)
+      .eq("created_by", session?.user.id)
       .order("created_at", { ascending: false })
 
     if (error) {
@@ -27,18 +30,18 @@ export async function GET(request: NextRequest) {
     const { count: totalWords } = await supabase
       .from("words")
       .select("*", { count: "exact", head: true })
-      .eq("created_by", session?.id)
+      .eq("created_by", session?.user.id)
 
     const { count: approvedWords } = await supabase
       .from("words")
       .select("*", { count: "exact", head: true })
-      .eq("created_by", session?.id)
+      .eq("created_by", session?.user.id)
       .eq("status", "approved")
 
     const { count: pendingWords } = await supabase
       .from("words")
       .select("*", { count: "exact", head: true })
-      .eq("created_by", session?.id)
+      .eq("created_by", session?.user.id)
       .eq("status", "pending")
 
     // Récupérer les points de l'utilisateur

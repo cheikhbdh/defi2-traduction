@@ -3,24 +3,22 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, Book, Users, Award, FileText } from "lucide-react"
 
 export default function Home() {
-
   return (
     <div className="flex flex-col min-h-screen">
 
       <main className="flex-1">
         <section className="py-20 bg-muted">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-4xl font-bold mb-6">Collaborative Hassaniya Dictionary</h2>
+            <h2 className="text-4xl font-bold mb-6">Dictionnaire Collaboratif Hassaniya</h2>
             <p className="text-xl mb-8 max-w-2xl mx-auto">
-              Join our community effort to document, preserve, and enrich the Hassaniya language through collaborative
-              contributions.
+              Rejoignez notre effort communautaire pour documenter, préserver et enrichir la langue Hassaniya grâce à des contributions collaboratives.
             </p>
             <div className="flex justify-center gap-4">
               <Button size="lg" className="gap-2">
-                Explore Dictionary <ArrowRight className="h-4 w-4" />
+                Explorer le Dictionnaire <ArrowRight className="h-4 w-4" />
               </Button>
               <Button size="lg" variant="outline" className="gap-2">
-                Contribute <Users className="h-4 w-4" />
+                Contribuer <Users className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -28,15 +26,15 @@ export default function Home() {
 
         <section className="py-16">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold mb-12 text-center">Key Features</h2>
+            <h2 className="text-3xl font-bold mb-12 text-center">Fonctionnalités Clés</h2>
             <div className="grid md:grid-cols-3 gap-8">
               <div className="bg-card p-6 rounded-lg shadow-sm">
                 <div className="mb-4 bg-primary/10 p-3 rounded-full w-fit">
                   <Book className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Collaborative Dictionary</h3>
+                <h3 className="text-xl font-semibold mb-2">Dictionnaire Collaboratif</h3>
                 <p className="text-muted-foreground">
-                  Contribute new words, edit existing entries, and help build a comprehensive Hassaniya dictionary.
+                  Contribuez avec de nouveaux mots, modifiez les entrées existantes et aidez à construire un dictionnaire Hassaniya complet.
                 </p>
               </div>
 
@@ -44,9 +42,9 @@ export default function Home() {
                 <div className="mb-4 bg-primary/10 p-3 rounded-full w-fit">
                   <FileText className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">AI-Powered Suggestions</h3>
+                <h3 className="text-xl font-semibold mb-2">Suggestions par IA</h3>
                 <p className="text-muted-foreground">
-                  Get AI-generated suggestions for word conjugations, derivations, and grammatical forms.
+                  Obtenez des suggestions générées par IA pour les conjugaisons, dérivations et formes grammaticales des mots.
                 </p>
               </div>
 
@@ -54,9 +52,9 @@ export default function Home() {
                 <div className="mb-4 bg-primary/10 p-3 rounded-full w-fit">
                   <Award className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Contributor Rewards</h3>
+                <h3 className="text-xl font-semibold mb-2">Récompenses des Contributeurs</h3>
                 <p className="text-muted-foreground">
-                  Earn points and badges for your contributions and track your progress on the leaderboard.
+                  Gagnez des points et des badges pour vos contributions et suivez votre progression sur le tableau des leaders.
                 </p>
               </div>
             </div>
@@ -65,9 +63,9 @@ export default function Home() {
 
         <section className="py-16 bg-muted">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold mb-6">1000 Root Words Challenge</h2>
+            <h2 className="text-3xl font-bold mb-6">Défi des 1000 Mots Racines</h2>
             <p className="text-xl mb-8 max-w-2xl mx-auto">
-              Join our special initiative to document the 1000 most commonly used root words in Hassaniya.
+              Participez à notre initiative spéciale pour documenter les 1000 mots racines les plus utilisés en Hassaniya.
             </p>
             <div className="bg-card p-8 rounded-lg max-w-md mx-auto">
               <div className="mb-4">
@@ -75,8 +73,8 @@ export default function Home() {
                   <div className="h-4 bg-primary/30 rounded-full w-[35%]"></div>
                 </div>
               </div>
-              <p className="font-semibold">350 of 1000 words documented</p>
-              <Button className="mt-4">Contribute to the Challenge</Button>
+              <p className="font-semibold">350 sur 1000 mots documentés</p>
+              <Button className="mt-4">Contribuer au Défi</Button>
             </div>
           </div>
         </section>
@@ -85,19 +83,19 @@ export default function Home() {
       <footer className="bg-primary text-primary-foreground py-8">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p>© 2025 Hassaniya Dictionary Project</p>
+            <p>© 2025 Projet du Dictionnaire Hassaniya</p>
             <div className="flex gap-6 mt-4 md:mt-0">
               <Link href="#" className="hover:underline">
-                About
+                À propos
               </Link>
               <Link href="#" className="hover:underline">
                 Contact
               </Link>
               <Link href="#" className="hover:underline">
-                Privacy Policy
+                Politique de Confidentialité
               </Link>
               <Link href="#" className="hover:underline">
-                Terms of Service
+                Conditions d'Utilisation
               </Link>
             </div>
           </div>
@@ -106,4 +104,3 @@ export default function Home() {
     </div>
   )
 }
-
