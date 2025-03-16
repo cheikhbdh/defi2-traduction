@@ -2,10 +2,9 @@ import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
 
-// Correction de la signature de la fonction pour les routes dynamiques dans Next.js
-export async function PUT(request: NextRequest, context: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const id = context.params.id
+    const id = params.id // Access `id` from `params`
     console.log("ID reçu:", id)
 
     const cookieStore = cookies()
@@ -101,4 +100,3 @@ export async function PUT(request: NextRequest, context: { params: { id: string 
     return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 })
   }
 }
-
