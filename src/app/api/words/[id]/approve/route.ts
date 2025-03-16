@@ -11,7 +11,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
     // Vérifier si l'utilisateur est authentifié
-    const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+    const { data: sessionData } = await supabase.auth.getSession()
     const session = sessionData?.session
 
     if (!session) {
