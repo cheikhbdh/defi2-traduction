@@ -2,9 +2,14 @@ import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest) {
   try {
-    const id = params.id // Access `id` from `params`
+    // Extract `id` from the URL path
+    const id = request.url.split("/").pop()
+    if (!id) {
+      return NextResponse.json({ error: "ID du mot manquant" }, { status: 400 })
+    }
+
     console.log("ID reçu:", id)
 
     const cookieStore = cookies()
