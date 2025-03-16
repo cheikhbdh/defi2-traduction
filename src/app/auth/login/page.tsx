@@ -66,7 +66,7 @@ export default function LoginPage() {
           setIsLoading(false)
         }
       }, 500) // 500ms delay
-    } catch (error: any) {
+    } catch (error) {
         console.error("Login error:", error)
         if (error instanceof Error) {
           setError(error.message)
