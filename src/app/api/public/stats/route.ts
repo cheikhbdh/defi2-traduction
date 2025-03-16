@@ -4,7 +4,7 @@ import { NextResponse } from "next/server"
 
 export async function GET() {
   try {
-    const cookieStore = await cookies() 
+    const cookieStore = cookies() // Remove `await` here
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
     // Récupérer le nombre total de mots
@@ -113,7 +113,7 @@ export async function GET() {
         challenge: {
           total: 1000,
           completed: approvedWords || 0, 
-          percentage: Math.min(100, Math.round(((approvedWords || 0) / 1000) * 100)),
+          percentage: Math.min(100, Math.round(((approvedWords || 0) / 1000) * 100),
         },
       },
       { status: 200 },
@@ -123,4 +123,3 @@ export async function GET() {
     return NextResponse.json({ error: "Une erreur est survenue" }, { status: 500 })
   }
 }
-
