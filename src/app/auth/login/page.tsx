@@ -41,10 +41,7 @@ export default function LoginPage() {
       }
 
       console.log("Login successful, session:", data.session)
-
-      // Add a small delay to ensure the session is properly set
-      // This helps with potential race conditions
-      setTimeout(async () => {
+    setTimeout(async () => {
         try {
           const userData = await getCurrentUser()
           console.log("User data after login:", userData)
@@ -70,9 +67,13 @@ export default function LoginPage() {
         }
       }, 500) // 500ms delay
     } catch (error: any) {
-      console.error("Login error:", error)
-      setError(error.message || "An error occurred during login")
-      setIsLoading(false)
+        console.error("Login error:", error)
+        if (error instanceof Error) {
+          setError(error.message)
+        } else {
+          setError("An error occurred during login")
+        }
+        setIsLoading(false)
     }
   }
 

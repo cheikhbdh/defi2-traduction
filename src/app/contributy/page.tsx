@@ -8,7 +8,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AlertCircle, CheckCircle2, Clock, Loader2, Trash2, Edit } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
@@ -41,7 +40,6 @@ type ContributionType = {
 }
 
 export default function ContributePage() {
-  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -181,9 +179,15 @@ export default function ContributePage() {
       } else {
         throw new Error(data.error || "Une erreur s'est produite lors de la soumission")
       }
-    } catch (error: any) {
-      console.error("Erreur:", error)
-      toast.error(error.message || "Une erreur s'est produite. Veuillez réessayer.")
+    } catch (error) {
+        if (error instanceof Error) {
+            toast.error(error.message || "Une erreur s'est produite. Veuillez réessayer.")
+          } else {
+            toast.error("Une erreur s'est produite. Veuillez réessayer.")
+          }
+          setIsLoading(false)
+        
+   
     } finally {
       setIsSubmitting(false)
     }
@@ -227,9 +231,14 @@ export default function ContributePage() {
       } else {
         throw new Error(data.error || "Une erreur s'est produite lors de la suppression")
       }
-    } catch (error: any) {
-      console.error("Erreur:", error)
-      toast.error(error.message || "Une erreur s'est produite lors de la suppression. Veuillez réessayer.")
+    } catch (error) {
+        if (error instanceof Error) {
+            toast.error(error.message || "Une erreur s'est produite. Veuillez réessayer.")
+          } else {
+            toast.error( "Une erreur s'est produite. Veuillez réessayer.")
+          }
+          setIsLoading(false)
+        
     } finally {
       setIsDeleting(false)
       setDeleteId(null)
@@ -369,7 +378,7 @@ export default function ContributePage() {
                 </div>
               ) : myContributions.length === 0 ? (
                 <div className="text-center py-10">
-                  <p className="text-muted-foreground">Vous n'avez pas encore contribué de mots.</p>
+                  <p className="text-muted-foreground">Vous n&apos;avez pas encore contribué de mots.</p>
                   <Button
                     className="mt-4"
                     onClick={() => {
@@ -417,7 +426,7 @@ export default function ContributePage() {
                             <DialogHeader>
                               <DialogTitle>Confirmer la suppression</DialogTitle>
                               <DialogDescription>
-                                Êtes-vous sûr de vouloir supprimer le mot "{contribution.term}" ? Cette action ne peut
+                                Êtes-vous sûr de vouloir supprimer le mot &quot;{contribution.term} &quot;? Cette action ne peut
                                 pas être annulée.
                               </DialogDescription>
                             </DialogHeader>

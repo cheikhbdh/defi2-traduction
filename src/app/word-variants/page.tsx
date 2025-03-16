@@ -31,7 +31,6 @@ export default function WordVariantsPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedWord, setSelectedWord] = useState<Word | null>(null)
   const [words, setWords] = useState<Word[]>([])
-  const [loading, setLoading] = useState(false)
   const [generating, setGenerating] = useState(false)
   const [variants, setVariants] = useState<Variant[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -78,7 +77,7 @@ export default function WordVariantsPage() {
   }, [searchTerm])
 
   const searchWords = async (term: string) => {
-    setLoading(true)
+
     try {
       const { data, error } = await supabase.from("words").select("*").ilike("term", `%${term}%`).limit(10)
 
@@ -87,9 +86,7 @@ export default function WordVariantsPage() {
     } catch (err) {
       console.error("Error searching words:", err)
       setError("Failed to search words")
-    } finally {
-      setLoading(false)
-    }
+    } 
   }
 
   const selectWord = async (word: Word) => {
@@ -136,7 +133,6 @@ export default function WordVariantsPage() {
         throw new Error("Failed to generate variants")
       }
 
-      const data = await response.json()
 
       // Fetch the updated variants
       const { data: updatedVariants, error } = await supabase
@@ -247,7 +243,7 @@ export default function WordVariantsPage() {
       {variants.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Generated Variants for "{selectedWord?.term}"</CardTitle>
+            <CardTitle>Generated Variants for &quot;{selectedWord?.term}&quot;</CardTitle>
             <CardDescription>Review the AI-generated variants for this word</CardDescription>
           </CardHeader>
           <CardContent>

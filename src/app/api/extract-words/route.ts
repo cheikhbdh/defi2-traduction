@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 
@@ -8,14 +7,11 @@ import { cookies } from "next/headers";
 const cookieStore = cookies()
 const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
-// Configure OpenAI with API key
-const openaiApiKey = process.env.OPENAI_API_KEY!;
 
 export async function POST(request: Request) {
     try {
       const formData = await request.formData();
       const textContent = formData.get("text") as string;
-      const userId = formData.get("userId") as string;
       
       if (!textContent) {
         return NextResponse.json(

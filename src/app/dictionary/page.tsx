@@ -19,7 +19,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Loader2 } from "lucide-react"
-import { ProtectedRoute } from "@/components/protected-route"
 
 type DictionaryEntry = {
   id: number
@@ -506,7 +505,7 @@ export default function DictionaryPage() {
                                 <DialogHeader>
                                   <DialogTitle>Confirmer la suppression</DialogTitle>
                                   <DialogDescription>
-                                    Êtes-vous sûr de vouloir supprimer le mot "{entry.term}" ? Cette action ne peut pas
+                                    Êtes-vous sûr de vouloir supprimer le mot &quot;{entry.term}&quot; ? Cette action ne peut pas
                                     être annulée.
                                   </DialogDescription>
                                 </DialogHeader>

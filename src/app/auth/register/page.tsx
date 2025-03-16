@@ -36,7 +36,7 @@ export default function RegisterPage() {
 
     try {
       // Register the user with Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      const {  error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -67,8 +67,14 @@ export default function RegisterPage() {
 
       // Redirect to login page or confirmation page
       router.push("/auth/login?registered=true")
-    } catch (error: any) {
-      setError(error.message || "An error occurred during registration")
+    } catch (error) {
+        if (error instanceof Error) {
+            setError(error.message)
+          } else {
+            setError("An error occurred during login")
+          }
+          setIsLoading(false)
+        
     } finally {
       setIsLoading(false)
     }

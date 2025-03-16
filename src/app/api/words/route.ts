@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Ajouter la route GET pour récupérer tous les mots
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const cookieStore = cookies()
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore })

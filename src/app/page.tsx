@@ -316,7 +316,7 @@ export default function Home() {
                 Politique de Confidentialité
               </Link>
               <Link href="#" className="hover:underline">
-                Conditions d'Utilisation
+                Conditions d&apos;Utilisation
               </Link>
             </div>
           </div>

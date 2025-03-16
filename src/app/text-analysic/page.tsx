@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -24,8 +23,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
-
-
 type ExtractedWord = {
   term: string
   context: string
@@ -42,7 +39,6 @@ export default function TextAnalysisPage() {
   } | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedWords, setSelectedWords] = useState<string[]>([])
   const [userId, setUserId] = useState<string | null>(null)
   const [wordToAdd, setWordToAdd] = useState<ExtractedWord | null>(null)
   const [definition, setDefinition] = useState("")
@@ -53,17 +49,18 @@ export default function TextAnalysisPage() {
     // Get current user
     const getUser = async () => {
       try {
-        const user =await getCurrentUser()
+        const user = await getCurrentUser()
 
         if (user) {
           console.log("User authenticated:", user.id)
           setUserId(user.id)
         } else {
           console.log("No user found")
-          setError("authentification required");
+          setError("Authentification required")
         }
       } catch (err) {
         console.error("Failed to get user:", err)
+        setError("Failed to fetch user data")
       }
     }
 
@@ -89,11 +86,6 @@ export default function TextAnalysisPage() {
 
     // For development/testing, allow analysis without login
     if (!userId) {
-      // You can either show an error or use a test user ID
-      // setError("You must be logged in to analyze text")
-      // return
-
-      // For testing purposes:
       console.log("Using test user ID for analysis")
     }
 
@@ -116,7 +108,6 @@ export default function TextAnalysisPage() {
 
       const data = await response.json()
       setResults(data)
-      setSelectedWords([])
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unknown error occurred")
     } finally {
@@ -316,7 +307,7 @@ export default function TextAnalysisPage() {
                               </DialogTrigger>
                               <DialogContent>
                                 <DialogHeader>
-                                  <DialogTitle>Add "{word.term}" to Dictionary</DialogTitle>
+                                  <DialogTitle>Add &quot;{word.term}&quot; to Dictionary</DialogTitle>
                                   <DialogDescription>
                                     {userId
                                       ? "Provide a definition and optional comment for this word."
@@ -368,7 +359,7 @@ export default function TextAnalysisPage() {
                               </DialogContent>
                             </Dialog>
                           </div>
-                          <p className="text-sm text-muted-foreground pl-6">Context: "{word.context}"</p>
+                          <p className="text-sm text-muted-foreground pl-6">Context: &quot;{word.context}&quot;</p>
                           {index < filteredWords.length - 1 && <Separator className="my-2" />}
                         </div>
                       ))}
@@ -435,4 +426,3 @@ export default function TextAnalysisPage() {
     </div>
   )
 }
-
