@@ -1,5 +1,6 @@
 'use client';
 
+import { ProtectedRoute } from '@/components/protected-route';
 import { useEffect, useState } from 'react';
 import { FaCheck, FaEdit } from 'react-icons/fa'; // Icônes pour Confirmer et Modifier
 
@@ -71,6 +72,7 @@ const ModerateurPage = () => {
   };
 
   return (
+    <ProtectedRoute requiredRole="moderateur">
     <div className="p-6 bg-gray-100 min-h-screen">
       <h1 className="text-3xl font-bold text-center mb-8 text-blue-600">Moderateur Interface</h1>
       <ul className="space-y-4">
@@ -105,6 +107,7 @@ const ModerateurPage = () => {
         ))}
       </ul>
     </div>
+    </ProtectedRoute>
   );
 };
 

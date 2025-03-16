@@ -66,6 +66,14 @@ export function MainNav() {
                 Dictionnaire
               </Link>
               <Link
+                href="/moderateur"
+                className={`hover:text-primary-foreground/80 ${
+                  pathname?.startsWith("/maderateur") ? "font-medium" : ""
+                }`}
+              >
+                moderateur
+              </Link>
+              <Link
                 href="/contribute"
                 className={`hover:text-primary-foreground/80 ${
                   pathname?.startsWith("/contribute") ? "font-medium" : ""

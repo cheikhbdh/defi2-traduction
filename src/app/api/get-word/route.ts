@@ -7,8 +7,7 @@ export async function GET() {
   try {
     const { data, error } = await supabase
       .from('words')
-      .select('*')
-      .eq('status', 'en_cours');
+      .select('*');
 
     if (error) {
       console.error('Error fetching terms:', error);

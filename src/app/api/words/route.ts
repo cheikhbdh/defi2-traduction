@@ -16,8 +16,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Vous devez être connecté pour ajouter un mot" }, { status: 401 })
     }
 
-    // Récupérer les données du corps de la requête
-    const { term, definition, part_of_speech, example } = await request.json()
+    const { term, definition } = await request.json()
 
     // Validation des données
     if (!term || !definition) {
@@ -31,7 +30,7 @@ export async function POST(request: NextRequest) {
         {
           term,
           definition,
-          status: "en_attente", // Utiliser la valeur autorisée
+          status: "en_attente", 
           created_by: session.user.id,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),

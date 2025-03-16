@@ -10,8 +10,6 @@ export async function GET(request: NextRequest) {
 
     const cookieStore = cookies()
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
-
-    // Vérifier si l'utilisateur est authentifié
     const {
       data: { session },
     } = await supabase.auth.getSession()
