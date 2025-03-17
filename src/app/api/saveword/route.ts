@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
-
-// Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-const supabase = createClient(supabaseUrl, supabaseServiceKey)
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
+import { cookies } from "next/headers"
 
 export async function POST(request: Request) {
   try {
     console.log("Received request to save word")
+
+    // Initialize cookies and Supabase client inside the request context
+    const cookieStore = cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
     const body = await request.json()
     console.log("Request body:", body)
@@ -93,4 +93,3 @@ export async function POST(request: Request) {
     )
   }
 }
-
