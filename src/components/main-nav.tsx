@@ -34,9 +34,10 @@ export function MainNav() {
           localStorage.setItem('userid', userData.id.toString())
           setUser({
             ...userData,
-            id: parseInt(userData.id, 10), // Convert `id` to a number
-            email: userData.email, // Ensure `email` is a string
+            id: parseInt(userData.id, 10), 
+            email: userData.email, 
           })
+          router.refresh()
         }
       } catch (error) {
         console.error("Erreur lors du chargement de l'utilisateur :", error)
@@ -164,3 +165,5 @@ export function MainNav() {
     </header>
   )
 }
+
+

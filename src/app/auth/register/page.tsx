@@ -15,7 +15,6 @@ import supabase from "@/lib/supabase"
 
 export default function RegisterPage() {
   const router = useRouter()
-  const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -27,7 +26,6 @@ export default function RegisterPage() {
     setIsLoading(true)
     setError(null)
 
-    // Validate passwords match
     if (password !== confirmPassword) {
       setError("Passwords do not match")
       setIsLoading(false)
@@ -38,12 +36,7 @@ export default function RegisterPage() {
       // Register the user with Supabase Auth
       const {  error: authError } = await supabase.auth.signUp({
         email,
-        password,
-        options: {
-          data: {
-            name,
-          },
-        },
+        password
       })
 
       if (authError) {
@@ -95,10 +88,7 @@ export default function RegisterPage() {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
-              <Input id="name" placeholder="John Doe" value={name} onChange={(e) => setName(e.target.value)} required />
-            </div>
+           
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
