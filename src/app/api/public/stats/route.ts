@@ -2,9 +2,17 @@ import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
 
+// Define the type for a contributor
+type Contributor = {
+  user_id: string
+  points: number
+  badges: string[]
+  name: string
+}
+
 export async function GET() {
   try {
-    const cookieStore = cookies() // Remove `await` here
+    const cookieStore = cookies()
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
     // Récupérer le nombre total de mots
@@ -80,7 +88,7 @@ export async function GET() {
 
     // Récupérer les noms des top contributeurs
     const userIds = topContributors.map((contributor) => contributor.user_id)
-    let topContributorsWithNames = []
+    let topContributorsWithNames: Contributor[] = [] // Explicitly define the type
 
     if (userIds.length > 0) {
       const { data: profiles, error: profilesError } = await supabase
@@ -112,8 +120,8 @@ export async function GET() {
         topContributors: topContributorsWithNames,
         challenge: {
           total: 1000,
-          completed: approvedWords || 0, 
-          percentage: Math.min(100, Math.round(((approvedWords || 0) / 1000) * 100),
+          completed: approvedWords || 0,
+          percentage: Math.min(100, Math.round(((approvedWords || 0) / 1000) * 100))
         },
       },
       { status: 200 },

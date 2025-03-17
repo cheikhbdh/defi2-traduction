@@ -1,48 +1,56 @@
-import {  NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
 
 export async function GET() {
   try {
-
-
-
     const cookieStore = cookies()
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+
+    // Get the current session
     const {
       data: { session },
     } = await supabase.auth.getSession()
 
+    if (!session) {
+      return NextResponse.json({ error: "Vous devez être connecté" }, { status: 401 })
+    }
+
+    // Fetch words created by the user
     const { data: words, error } = await supabase
       .from("words")
       .select("*")
-      .eq("created_by", session?.user.id)
+      .eq("created_by", session.user.id) // Use session.user.id
       .order("created_at", { ascending: false })
 
     if (error) {
       throw error
     }
 
-    // Récupérer les statistiques de base
+    // Fetch basic statistics
     const { count: totalWords } = await supabase
       .from("words")
       .select("*", { count: "exact", head: true })
-      .eq("created_by", session?.user.id)
+      .eq("created_by", session.user.id) // Use session.user.id
 
     const { count: approvedWords } = await supabase
       .from("words")
       .select("*", { count: "exact", head: true })
-      .eq("created_by", session?.user.id)
+      .eq("created_by", session.user.id) // Use session.user.id
       .eq("status", "approved")
 
     const { count: pendingWords } = await supabase
       .from("words")
       .select("*", { count: "exact", head: true })
-      .eq("created_by", session?.user.id)
+      .eq("created_by", session.user.id) // Use session.user.id
       .eq("status", "pending")
 
-    // Récupérer les points de l'utilisateur
-    const { data: rewards } = await supabase.from("rewards").select("points").eq("user_id", session?.id).single()
+    // Fetch user rewards
+    const { data: rewards } = await supabase
+      .from("rewards")
+      .select("points")
+      .eq("user_id", session.user.id) // Use session.user.id
+      .single()
 
     const stats = {
       totalWords: totalWords || 0,
@@ -63,4 +71,3 @@ export async function GET() {
     return NextResponse.json({ error: "Erreur lors de la récupération des mots" }, { status: 500 })
   }
 }
-

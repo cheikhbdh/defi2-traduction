@@ -30,10 +30,14 @@ export function MainNav() {
     async function loadUser() {
       try {
         const userData = await getCurrentUser()
-        if (userData?.id) {
+        if (userData?.id && userData.email) { // Ensure `email` is defined
           localStorage.setItem('userid', userData.id.toString())
+          setUser({
+            ...userData,
+            id: parseInt(userData.id, 10), // Convert `id` to a number
+            email: userData.email, // Ensure `email` is a string
+          })
         }
-        setUser(userData)
       } catch (error) {
         console.error("Erreur lors du chargement de l'utilisateur :", error)
       } finally {
